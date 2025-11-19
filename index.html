@@ -13,7 +13,9 @@
         :root {
             /* Paleta de Cores Modernas */
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+            /* Novo gradiente de fundo, mais vibrante */
+            --bg-gradient-dynamic: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%); 
+            
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.3);
             
@@ -36,10 +38,11 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background-image: var(--bg-gradient);
+            background-image: var(--bg-gradient-dynamic); 
             color: var(--text-primary); 
             padding: 30px;
             min-height: 100vh;
+            background-attachment: fixed; 
         }
 
         .container { max-width: 1400px; margin: 0 auto; }
@@ -123,7 +126,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
-            margin-top: 18px; /* Alinhar com selects */
+            margin-top: 18px; 
         }
         .btn-reset:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 
@@ -445,8 +448,6 @@
             document.getElementById('kpiUnits').innerText = totalUnits;
             document.getElementById('kpiTicket').innerText = formatCurrency(avgTicket);
 
-            // Tendência (simples: compara com o set completo se não houver filtro de mês, ou zerado)
-            // Se estivermos a filtrar por mês específico, a tendência perde sentido temporal, então ocultamos ou mostramos neutro.
             const isMonthFiltered = document.getElementById('filterMonth').value !== 'all';
             
             if(isMonthFiltered || data.length === 0) {
@@ -581,35 +582,58 @@
                     borderColor: 'transparent', 
                     borderRadius: 8, 
                     barThickness: 30,
-                    hoverBackgroundColor: colors.vivid[0] // Efeito hover simples
+                    hoverBackgroundColor: colors.vivid[0] 
                 }];
                 
                 if(type === 'line') {
                     chart.data.datasets[0].borderColor = colors.vivid[1];
-                    chart.data.datasets[0].backgroundColor = 'rgba(121, 40, 202, 0.1)'; // Roxo suave
+                    chart.data.datasets[0].backgroundColor = 'rgba(121, 40, 202, 0.1)';
                     chart.data.datasets[0].borderWidth = 3;
                     chart.data.datasets[0].pointBackgroundColor = 'white';
                     chart.data.datasets[0].pointBorderColor = colors.vivid[1];
                     chart.data.datasets[0].pointRadius = 4;
                     chart.data.datasets[0].fill = true;
                     chart.data.datasets[0].tension = 0.4;
+
+                    // Custom Tooltip Logic for Line Chart (Monthly variation)
+                    chart.options.plugins.tooltip.callbacks.label = function(context) {
+                        let label = ' ' + formatCurrency(context.raw);
+                        // Check if there is a previous point
+                        if (context.dataIndex > 0) {
+                            const current = context.raw;
+                            const previous = context.chart.data.datasets[0].data[context.dataIndex - 1];
+                            if (previous && previous !== 0) {
+                                const percent = ((current - previous) / previous) * 100;
+                                const sign = percent > 0 ? '+' : '';
+                                const symbol = percent > 0 ? '▲' : '▼';
+                                label += ` (${symbol} ${sign}${percent.toFixed(1)}% vs mês anterior)`;
+                            }
+                        }
+                        return label;
+                    };
                 } else if (type === 'doughnut') {
                    chart.data.datasets[0].backgroundColor = colors.vivid;
                    chart.data.datasets[0].borderColor = 'white';
                    chart.data.datasets[0].borderWidth = 2;
+                   // Reset default label callback for non-line charts
+                   chart.options.plugins.tooltip.callbacks.label = function(context) {
+                        return ' ' + formatCurrency(context.raw);
+                   };
                 } else {
-                   // Bar Charts: Gradient effect simulation by using single colors per bar
+                   // Bar Charts
                    chart.data.datasets[0].backgroundColor = agg.values.map((_, i) => colors.vivid[i % colors.vivid.length]);
+                   // Reset default label callback for non-line charts
+                   chart.options.plugins.tooltip.callbacks.label = function(context) {
+                        return ' ' + formatCurrency(context.raw);
+                   };
                 }
 
-                // Tooltips formatados
+                // Tooltips general styling
                 chart.options.plugins.tooltip.backgroundColor = 'rgba(45, 55, 72, 0.9)';
                 chart.options.plugins.tooltip.padding = 10;
                 chart.options.plugins.tooltip.cornerRadius = 8;
-                chart.options.plugins.tooltip.callbacks.label = function(context) {
-                    return ' ' + formatCurrency(context.raw);
-                };
                 
+                // Format Axis
                 if (type !== 'doughnut') {
                     const axis = type === 'bar' && chart.config.type === 'bar' && chart.options.indexAxis !== 'y' ? 'y' : (chart.options.indexAxis === 'y' ? 'x' : 'y');
                     chart.options.scales[axis].ticks.callback = function(value) { return formatCurrency(value); };
@@ -621,12 +645,13 @@
             update(charts.seller, aggregateData(data, 'seller'));
             update(charts.product, aggregateData(data, 'product'), 'doughnut');
             
+            // Gráfico de Tempo
             const tData = aggregateData(data, 'date');
             const order = ['Jan', 'Fev', 'Mar'];
             const sorted = tData.labels.map((l, i) => ({l, v: tData.values[i]})).sort((a, b) => order.indexOf(a.l) - order.indexOf(b.l));
             update(charts.time, { labels: sorted.map(x => x.l), values: sorted.map(x => x.v) }, 'line');
             
-            // Atualizar badge de evolução
+            // Atualizar subtítulo do gráfico de tempo
             const subtitle = document.getElementById('chartTimeSubtitle');
             if(sorted.length >= 2) {
                 const last = sorted[sorted.length-1].v;
