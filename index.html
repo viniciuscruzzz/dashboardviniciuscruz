@@ -198,6 +198,75 @@
             color: var(--color-2);
         }
 
+        /* Nova Tabela de Produtos */
+        .table-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            overflow-x: auto; /* Responsivo */
+        }
+
+        .table-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #f0f2f5;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f2f5;
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .price-col {
+            font-family: 'Consolas', monospace;
+            color: var(--color-2);
+            font-weight: 600;
+        }
+        
+        .total-col {
+            font-weight: 700;
+        }
+
+        /* Badge de Categoria de Preço */
+        .badge-price {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .high-ticket { background: #e6fffa; color: #00b8d9; } /* Alto Valor */
+        .mid-ticket { background: #fff0b3; color: #b76e00; } /* Médio Valor */
+        .low-ticket { background: #ffe3e3; color: #c53030; } /* Baixo Valor */
+
         /* Charts Section */
         .charts-grid {
             display: grid;
@@ -296,6 +365,27 @@
             <div class="cards-grid" id="sellerCardsContainer">
                 <!-- Cards gerados via JS -->
             </div>
+        </section>
+
+        <!-- NOVA SECÇÃO: Tabela Detalhada de Produtos -->
+        <section class="table-section">
+            <div class="table-header">
+                <h3>Detalhe de Produtos & Preços (Impacto no Ticket Médio)</h3>
+            </div>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço Unitário</th>
+                        <th>Unidades Vendidas</th>
+                        <th>Total Vendas (€)</th>
+                        <th>Classificação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas geradas via JS -->
+                </tbody>
+            </table>
         </section>
 
         <!-- Gráficos -->
@@ -397,7 +487,8 @@
             const data = getFilteredData();
             
             updateKPIs(data);
-            updateSellerBestProducts(data); // Nova Métrica
+            updateSellerBestProducts(data);
+            updateProductTable(data);
             updateChartsData(data);
         }
 
@@ -411,7 +502,7 @@
             document.getElementById('kpiTicket').innerText = formatEuro(avgTicket);
         }
 
-        // NOVA FUNÇÃO: Cards de "Produto Estrela" por Vendedor
+        // FUNÇÃO CORRIGIDA: Cards de "Produto Estrela" por Vendedor
         function updateSellerBestProducts(data) {
             const container = document.getElementById('sellerCardsContainer');
             container.innerHTML = '';
@@ -459,6 +550,54 @@
                     </div>
                 `;
                 container.appendChild(card);
+            });
+        }
+
+        // FUNÇÃO CORRIGIDA: Atualizar Tabela de Produtos
+        function updateProductTable(data) {
+            const tbody = document.querySelector('#productTable tbody');
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Sem dados.</td></tr>';
+                return;
+            }
+
+            // Agrupar por produto para somar totais, mas manter preço unitário
+            const productsMap = {};
+            data.forEach(item => {
+                if(!productsMap[item.product]) {
+                    productsMap[item.product] = {
+                        name: item.product,
+                        price: item.price,
+                        units: 0,
+                        total: 0
+                    };
+                }
+                productsMap[item.product].units += item.units;
+                productsMap[item.product].total += item.total;
+            });
+
+            // Converter para array e ordenar por Total Vendas (Decrescente)
+            const sortedProducts = Object.values(productsMap).sort((a,b) => b.total - a.total);
+
+            sortedProducts.forEach(p => {
+                const tr = document.createElement('tr');
+                
+                // Classificação Simples baseada no preço
+                let badgeClass = 'low-ticket';
+                let badgeLabel = 'Volume';
+                if (p.price >= 1000) { badgeClass = 'high-ticket'; badgeLabel = 'High Ticket'; }
+                else if (p.price >= 200) { badgeClass = 'mid-ticket'; badgeLabel = 'Médio'; }
+
+                tr.innerHTML = `
+                    <td style="font-weight:600">${p.name}</td>
+                    <td class="price-col">${formatEuro(p.price)}</td>
+                    <td style="text-align:center">${p.units}</td>
+                    <td class="total-col">${formatEuro(p.total)}</td>
+                    <td><span class="badge-price ${badgeClass}">${badgeLabel}</span></td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
