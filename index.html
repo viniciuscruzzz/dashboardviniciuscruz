@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Interativo Premium</title>
+    <title>Dashboard Premium Interativo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -18,7 +18,7 @@
             --accent-color: #6b46c1; 
             --color-actual: #7928CA;
             --color-projected: #FF0080;
-            --color-recovery: #00E096; /* Verde para a recuperação */
+            --color-recovery: #00E096;
             --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
             --radius: 20px;
         }
@@ -247,7 +247,7 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <span class="chart-title-text">Evolução & Projeção de Recuperação</span>
-                    <span class="click-hint">Clique no mês</span>
+                    <span class="click-hint">Clique no mês (Histórico)</span>
                 </div>
                 <div class="canvas-container"><canvas id="chartTime"></canvas></div>
                 <div id="chartTimeSubtitle" class="trend-badge trend-neutral" style="align-self: flex-start; margin-top: 5px;">--</div>
@@ -342,7 +342,7 @@
             showToast("Filtros Removidos");
         }
 
-        // --- CROSS-FILTERING COM TOGGLE FIX ---
+        // --- CROSS-FILTERING INTELIGENTE ---
         function handleChartClick(type, labelValue) {
             const selectMap = { 'region': 'filterRegion', 'seller': 'filterSeller', 'product': 'filterProduct', 'month': 'filterMonth' };
             const selectId = selectMap[type];
@@ -350,14 +350,20 @@
             
             let targetValue = labelValue;
             
-            // Conversão especial para Mês (Label "Jan" -> Value "0")
+            // Lógica Especial para Mês
             if(type === 'month') {
                 const months = ['Jan', 'Fev', 'Mar'];
                 const idx = months.indexOf(labelValue);
-                if(idx > -1) targetValue = idx.toString();
+                
+                // Se clicar num mês de projeção (Abr, Mai, Jun), não faz nada além de avisar
+                if(idx === -1) {
+                    showToast("Apenas dados históricos (Jan-Mar) podem ser filtrados.");
+                    return;
+                }
+                targetValue = idx.toString();
             }
 
-            // Lógica de Toggle (Desfazer filtro se clicar no mesmo)
+            // Toggle Lógica
             if (select.value === targetValue) {
                 select.value = 'all';
                 showToast(`Filtro removido: ${labelValue}`);
@@ -372,9 +378,10 @@
                     }
                 }
                 if(found) showToast(`Filtrando por: ${labelValue}`);
-                else if (type === 'month') { // Força valor se for mês (casos de index)
-                    select.value = targetValue;
-                    showToast(`Filtrando por: ${labelValue}`);
+                // Fallback para mês (Value '0' vs Label 'Jan')
+                else if (type === 'month') { 
+                    select.value = targetValue; 
+                    showToast(`Filtrando por: ${labelValue}`); 
                 }
             }
             updateDashboard();
@@ -406,7 +413,7 @@
             if (type === 1) {
                 rate = 110; 
                 btns[1].classList.add('recovery-active');
-                simulationState.isRecovery = true; // Ativa visualização de melhoria
+                simulationState.isRecovery = true; 
                 desc.innerText = "*Cenário de Correção: Recuperação do nível de stock e vendas.";
             }
             if (type === 2) {
@@ -537,7 +544,21 @@
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label + ': ' + formatCurrency(context.raw);
-                                    if (context.dataset.label === 'Recuperação') label += ' (Ganho Estimado)';
+                                    if (context.dataset.label === 'Recuperação de Stock') label += ' (Ganho)';
+                                    
+                                    // Logica de Percentual para TODOS os Datasets
+                                    // Se houver um ponto anterior no mesmo dataset, calcula variação
+                                    if (context.dataIndex > 0) {
+                                        const prev = context.chart.data.datasets[context.datasetIndex].data[context.dataIndex - 1];
+                                        // O gráfico conecta datasets, então se prev for null, tentamos pegar da "base" (apenas para projected)
+                                        // Mas aqui simplificamos: calcula apenas se prev existe no mesmo array
+                                        if (prev && prev !== 0) {
+                                            const p = ((context.raw - prev) / prev) * 100;
+                                            const sign = p >= 0 ? '+' : '';
+                                            const symbol = p >= 0 ? '🟢' : '🔻';
+                                            label += ` | ${symbol} ${sign}${p.toFixed(1)}% vs mês ant.`;
+                                        }
+                                    }
                                     return label;
                                 }
                             }
@@ -590,17 +611,14 @@
             const dsProjected = { label: 'Projeção', data: isFull ? [null, null, baseline, ...proj] : [], borderColor: colors.projected, backgroundColor: colors.projected, borderWidth: 3, borderDash: [5, 5], tension: 0.4 };
             
             // Lógica de Visualização da "Carencia de Produtos" (Recuperação)
-            // Se estiver no modo recuperação, adiciona um dataset de área para destacar o ganho
             let dsRecovery = null;
             if (simulationState.isRecovery && isFull) {
-                // Cria uma linha "Base" (Tendência ruim) vs "Projeção" (Recuperação)
-                // Apenas para efeito visual de preenchimento
                 dsRecovery = {
                     label: 'Recuperação de Stock',
                     data: [null, null, baseline, proj[0], proj[1], proj[2]],
                     borderColor: 'transparent',
-                    backgroundColor: 'rgba(0, 224, 150, 0.2)', // Verde transparente
-                    fill: 'start', // Preenche até ao início (ou até outro dataset se configurado, simplificado aqui)
+                    backgroundColor: 'rgba(0, 224, 150, 0.2)', 
+                    fill: 'start', 
                     pointRadius: 0
                 };
             }
