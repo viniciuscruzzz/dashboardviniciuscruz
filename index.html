@@ -3,33 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Premium Q1 2025</title>
-    <!-- Importando Chart.js -->
+    <title>Dashboard Interativo Premium</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Importando Fonte Moderna (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Paleta de Cores Modernas */
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            /* Novo gradiente de fundo, mais vibrante */
             --bg-gradient-dynamic: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%); 
-            
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.3);
-            
             --text-primary: #2d3748;
             --text-secondary: #718096;
-            --accent-color: #6b46c1; /* Roxo Moderno */
-            
-            /* Cores Gráficos (Vivid) */
-            --color-1: #FF0080; /* Rosa Neon */
-            --color-2: #7928CA; /* Roxo Vivo */
-            --color-3: #00DFD8; /* Turquesa */
-            --color-4: #FF005C; /* Vermelho/Rosa */
-            
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --accent-color: #6b46c1; 
+            --color-actual: #7928CA;
+            --color-projected: #FF0080;
+            --color-recovery: #00E096; /* Verde para a recuperação */
             --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
             --radius: 20px;
         }
@@ -47,188 +36,101 @@
 
         .container { max-width: 1400px; margin: 0 auto; }
 
-        /* Header Styling */
-        header { 
-            margin-bottom: 35px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            gap: 20px;
-        }
-
-        .header-title h1 { 
-            font-size: 2.2rem; 
-            font-weight: 800; 
-            letter-spacing: -1px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
+        /* Header */
+        header { margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px; }
+        .header-title h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .header-title p { color: var(--text-secondary); font-weight: 500; }
         
-        .header-title p {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        /* Control Bar styling */
+        /* Controls */
         .controls-container {
-            background: var(--glass-bg);
-            padding: 15px 25px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-            border: var(--glass-border);
-            backdrop-filter: blur(10px);
+            background: var(--glass-bg); padding: 15px 25px; border-radius: var(--radius);
+            box-shadow: var(--shadow-md); display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+            border: var(--glass-border); backdrop-filter: blur(10px);
         }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .filter-group label { 
-            font-size: 0.75rem; 
-            font-weight: 700; 
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
         
-        select { 
-            padding: 10px 15px; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 12px; 
-            background-color: #fff; 
-            font-weight: 600; 
-            color: var(--text-primary); 
-            cursor: pointer; 
-            outline: none; 
-            min-width: 130px;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
+        select { padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 600; color: var(--text-primary); cursor: pointer; outline: none; min-width: 130px; }
+        select:focus { border-color: var(--accent-color); }
         
-        select:hover { border-color: #cbd5e0; }
-        select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.1); }
+        .btn-reset { background: var(--primary-gradient); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 18px; }
+        .btn-reset:hover { transform: translateY(-2px); }
         
-        .btn-reset {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 18px; 
+        /* Simulation Panel */
+        .simulation-section {
+            background: #fff; border-radius: var(--radius); padding: 25px;
+            box-shadow: var(--shadow-md); margin-bottom: 35px;
+            border-left: 6px solid var(--color-projected);
+            display: flex; flex-wrap: wrap; gap: 30px; align-items: center;
         }
-        .btn-reset:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .sim-controls { flex: 2; min-width: 300px; }
+        .sim-results { flex: 1; min-width: 250px; display: flex; gap: 15px; background: #f7fafc; padding: 20px; border-radius: 15px; }
+        
+        .scenario-buttons { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .scenario-btn { padding: 8px 14px; border: 2px solid #e2e8f0; background: transparent; border-radius: 10px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: 0.2s; }
+        .scenario-btn.active { background: var(--color-projected); color: white; border-color: var(--color-projected); }
+        .scenario-btn.recovery-active { background: var(--color-recovery); color: white; border-color: var(--color-recovery); }
+        
+        .slider-container { margin-top: 10px; }
+        .slider-label { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
+        input[type=range] { width: 100%; accent-color: var(--color-projected); cursor: pointer; }
 
-        /* Currency Toggle specific style */
-        #currencySelector {
-            background: #edf2f7;
-            border: none;
-            color: var(--accent-color);
-        }
+        .sim-kpi-box { flex: 1; text-align: center; }
+        .sim-kpi-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
+        .sim-kpi-value { font-size: 1.4rem; font-weight: 800; color: var(--color-projected); margin-top: 5px; }
 
-        /* KPIs Section */
+        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 35px; }
-        
-        .kpi-card { 
-            background: #fff; 
-            padding: 25px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow-md); 
-            position: relative; 
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
+        .kpi-card { background: #fff; padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow-md); position: relative; overflow: hidden; transition: transform 0.3s; }
         .kpi-card:hover { transform: translateY(-5px); }
-
-        /* Decorative gradient bar on top */
-        .kpi-card::after { 
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; 
-            background: linear-gradient(90deg, var(--color-1), var(--color-2));
-        }
+        .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--color-1), var(--color-2)); }
         .kpi-card.c2::after { background: linear-gradient(90deg, var(--color-3), var(--color-2)); }
         .kpi-card.c3::after { background: linear-gradient(90deg, var(--color-4), var(--color-1)); }
         
         .kpi-label { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; }
         .kpi-value { font-size: 2.2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -1px; }
         
-        /* Trend Badges */
-        .trend-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 12px; border-radius: 50px;
-            font-size: 0.8rem; font-weight: 700; margin-top: 12px;
-        }
+        .trend-badge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; margin-top: 12px; }
         .trend-up { background: #def7ec; color: #03543f; }
         .trend-down { background: #fde8e8; color: #9b1c1c; }
         .trend-neutral { background: #f3f4f6; color: #4b5563; }
 
-        /* Sections Titles */
-        .section-header {
-            display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+        /* Charts & Tables */
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; }
+        .chart-card { background: white; padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-md); height: 450px; display: flex; flex-direction: column; cursor: pointer; transition: border-color 0.3s; border: 2px solid transparent; }
+        .chart-card:hover { border-color: rgba(107, 70, 193, 0.3); }
+        
+        .chart-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .chart-title-text { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .click-hint { font-size: 0.7rem; background: #edf2f7; padding: 4px 8px; border-radius: 4px; color: #718096; font-weight: 600; }
+        
+        .canvas-container { flex-grow: 1; position: relative; width: 100%; }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #2d3748; color: #fff; text-align: center;
+            border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-weight: 600;
+            opacity: 0; transition: opacity 0.3s, bottom 0.3s;
         }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #toast span { color: #00DFD8; }
+
+        /* Helpers */
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; margin-top: 35px; }
         .section-title { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
-        .section-icon { 
-            background: var(--accent-color); color: white; 
-            width: 32px; height: 32px; border-radius: 10px; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-        }
-
-        /* Cards Grid (Produtos Estrela) */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-bottom: 35px; }
-        
-        .seller-card { 
-            background: white; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow-sm); 
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid #f0f0f0;
-        }
-        .seller-info h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-        .top-product-badge { background: #ebf8ff; color: #2b6cb0; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
-        .seller-total strong { font-size: 1.2rem; color: var(--accent-color); }
-
-        /* Table Styling */
-        .table-section { background: white; padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-md); margin-bottom: 35px; overflow-x: auto; }
-        
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .seller-card { background: white; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow-md); display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
+        .table-section { background: white; padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-md); overflow-x: auto; margin-bottom: 30px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        th { text-align: left; padding: 15px; color: var(--text-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #f0f0f0; }
-        td { padding: 15px; border-bottom: 1px solid #f7fafc; color: var(--text-primary); font-weight: 500; }
-        tr:last-child td { border-bottom: none; }
-        
+        th { text-align: left; padding: 15px; color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; border-bottom: 2px solid #f0f0f0; }
+        td { padding: 15px; border-bottom: 1px solid #f7fafc; color: var(--text-primary); }
         .badge-price { padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; }
         .high-ticket { background: #e6fffa; color: #2c7a7b; }
         .mid-ticket { background: #fffaf0; color: #c05621; }
         .low-ticket { background: #fff5f5; color: #c53030; }
 
-        /* Charts Grid */
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(550px, 1fr)); gap: 30px; }
-        
-        .chart-card { 
-            background: white; padding: 30px; border-radius: var(--radius); 
-            box-shadow: var(--shadow-md); height: 450px; 
-            display: flex; flex-direction: column;
-        }
-        
-        .chart-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .chart-title-text { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        
-        .canvas-container { flex-grow: 1; position: relative; width: 100%; }
-
-        @media (max-width: 768px) {
-            .controls-container { flex-direction: column; align-items: stretch; }
-            .btn-reset { margin-top: 0; }
-            .charts-grid { grid-template-columns: 1fr; }
-            .header-title h1 { font-size: 1.8rem; }
-        }
+        @media (max-width: 1024px) { .charts-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -237,7 +139,7 @@
         <header>
             <div class="header-title">
                 <h1>Dashboard Vendas Q1</h1>
-                <p>Análise Premium de Performance</p>
+                <p>Análise Premium Interativa</p>
             </div>
             
             <div class="controls-container">
@@ -249,7 +151,6 @@
                         <option value="BRL">Real (R$)</option>
                     </select>
                 </div>
-
                 <div class="filter-group">
                     <label>Mês</label>
                     <select id="filterMonth" onchange="updateDashboard()">
@@ -259,25 +160,59 @@
                         <option value="2">Março</option>
                     </select>
                 </div>
-
                 <div class="filter-group">
                     <label>Região</label>
                     <select id="filterRegion" onchange="updateDashboard()"><option value="all">Todas</option></select>
                 </div>
-
                 <div class="filter-group">
                     <label>Vendedor</label>
                     <select id="filterSeller" onchange="updateDashboard()"><option value="all">Todos</option></select>
                 </div>
-
+                <div class="filter-group">
+                    <label>Produto</label>
+                    <select id="filterProduct" onchange="updateDashboard()"><option value="all">Todos</option></select>
+                </div>
                 <button class="btn-reset" onclick="resetFilters()">Limpar Filtros</button>
             </div>
         </header>
 
+        <!-- SIMULAÇÃO Q2 -->
+        <section class="simulation-section">
+            <div class="sim-controls">
+                <div class="section-header" style="margin:0 0 10px 0;">
+                    <span style="font-size:1.5rem">🚀</span>
+                    <div class="section-title">Simulador Q2 (Abr-Jun)</div>
+                </div>
+                <div class="scenario-buttons">
+                    <button class="scenario-btn active" onclick="setScenario(0)">Tendência Atual (Baixa)</button>
+                    <button class="scenario-btn" onclick="setScenario(1)">Recuperar Stock (Correção)</button>
+                    <button class="scenario-btn" onclick="setScenario(2)">Super Bundles (Otimista)</button>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Ajuste Crescimento</span>
+                        <span id="growthValueDisplay" style="color:var(--color-projected)">0%</span>
+                    </div>
+                    <input type="range" id="growthSlider" min="-50" max="300" value="0" step="10" oninput="updateProjectionFromSlider()">
+                </div>
+                <p id="scenario-desc" style="font-size:0.8rem; color:#718096; margin-top:10px;">*Cenário base: projeção linear da queda de Março.</p>
+            </div>
+            <div class="sim-results">
+                <div class="sim-kpi-box">
+                    <div class="sim-kpi-label">Previsão Q2</div>
+                    <div class="sim-kpi-value" id="projRevenue">€ 0</div>
+                </div>
+                <div class="sim-kpi-box" style="border-left:1px solid #e2e8f0">
+                    <div class="sim-kpi-label">Variação vs Q1</div>
+                    <div class="sim-kpi-value" id="projDiff">0%</div>
+                </div>
+            </div>
+        </section>
+
         <!-- KPIs -->
         <section class="kpi-grid">
             <div class="kpi-card c1">
-                <div class="kpi-label">Faturação Total</div>
+                <div class="kpi-label">Faturação (Real)</div>
                 <div class="kpi-value" id="kpiSales">€ 0,00</div>
                 <div id="trendSales" class="trend-badge trend-neutral"><span>--%</span></div>
             </div>
@@ -287,69 +222,63 @@
                 <div id="trendUnits" class="trend-badge trend-neutral"><span>--%</span></div>
             </div>
             <div class="kpi-card c3">
-                <div class="kpi-label">Ticket Médio (Por Fatura)</div>
+                <div class="kpi-label">Ticket Médio</div>
                 <div class="kpi-value" id="kpiTicket">€ 0,00</div>
             </div>
         </section>
 
-        <!-- Produto Estrela -->
-        <section class="best-sellers-section">
-            <div class="section-header">
-                <div class="section-icon">★</div>
-                <div class="section-title">Destaques da Equipa</div>
-            </div>
-            <div class="cards-grid" id="sellerCardsContainer"></div>
-        </section>
+        <div class="section-header">
+            <span style="font-size:1.5rem">★</span><span class="section-title">Destaques</span>
+        </div>
+        <section class="cards-grid" id="sellerCardsContainer"></section>
 
-        <!-- Tabela -->
+        <div class="section-header">
+            <span style="font-size:1.5rem">☰</span><span class="section-title">Detalhe de Produtos</span>
+        </div>
         <section class="table-section">
-            <div class="section-header">
-                <div class="section-icon">☰</div>
-                <div class="section-title">Detalhe de Produtos & Preços</div>
-            </div>
             <table id="productTable">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Preço Unit.</th>
-                        <th>Qtd.</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Produto</th><th>Preço Unit.</th><th>Qtd.</th><th>Total</th><th>Classificação</th></tr></thead>
                 <tbody></tbody>
             </table>
         </section>
 
-        <!-- Gráficos -->
+        <!-- Gráficos Interativos -->
         <section class="charts-grid">
             <div class="chart-card">
                 <div class="chart-header">
-                    <span class="chart-title-text">Performance por Região</span>
+                    <span class="chart-title-text">Evolução & Projeção de Recuperação</span>
+                    <span class="click-hint">Clique no mês</span>
+                </div>
+                <div class="canvas-container"><canvas id="chartTime"></canvas></div>
+                <div id="chartTimeSubtitle" class="trend-badge trend-neutral" style="align-self: flex-start; margin-top: 5px;">--</div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <span class="chart-title-text">Por Região</span>
+                    <span class="click-hint">Clique na barra</span>
                 </div>
                 <div class="canvas-container"><canvas id="chartRegion"></canvas></div>
             </div>
             <div class="chart-card">
                 <div class="chart-header">
                     <span class="chart-title-text">Ranking Vendedores</span>
+                    <span class="click-hint">Clique na barra</span>
                 </div>
                 <div class="canvas-container"><canvas id="chartSeller"></canvas></div>
             </div>
             <div class="chart-card">
                 <div class="chart-header">
                     <span class="chart-title-text">Mix de Produtos</span>
+                    <span class="click-hint">Clique na fatia</span>
                 </div>
                 <div class="canvas-container"><canvas id="chartProduct"></canvas></div>
             </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <span class="chart-title-text">Evolução Mensal</span>
-                    <div id="chartTimeSubtitle" class="trend-badge trend-neutral" style="margin:0; font-size:0.7rem;">--</div>
-                </div>
-                <div class="canvas-container"><canvas id="chartTime"></canvas></div>
-            </div>
         </section>
     </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast">Filtro Aplicado: <span id="toast-msg"></span></div>
 
     <script>
         // --- DADOS ---
@@ -367,43 +296,30 @@
         ];
 
         let currentCurrency = 'EUR';
-        const exchangeRates = {
-            'EUR': { rate: 1, locale: 'pt-PT', currency: 'EUR' },
-            'USD': { rate: 1.05, locale: 'en-US', currency: 'USD' },
-            'BRL': { rate: 6.15, locale: 'pt-BR', currency: 'BRL' }
-        };
-
+        const exchangeRates = { 'EUR': { rate: 1, locale: 'pt-PT', currency: 'EUR' }, 'USD': { rate: 1.05, locale: 'en-US', currency: 'USD' }, 'BRL': { rate: 6.15, locale: 'pt-BR', currency: 'BRL' } };
         let charts = {};
-        // Paleta moderna
-        const colors = { 
-            vivid: ['#FF0080', '#7928CA', '#00DFD8', '#FF005C', '#F5A623', '#4A90E2', '#BD10E0', '#50E3C2'],
-            bg: ['rgba(255, 0, 128, 0.7)', 'rgba(121, 40, 202, 0.7)', 'rgba(0, 223, 216, 0.7)', 'rgba(255, 0, 92, 0.7)']
-        };
+        let simulationState = { growthRate: 0, isRecovery: false };
+        const colors = { vivid: ['#FF0080', '#7928CA', '#00DFD8', '#FF005C', '#F5A623', '#4A90E2', '#BD10E0'], actual: '#7928CA', projected: '#FF0080', recovery: '#00E096' };
 
         window.onload = function() {
             populateFilters();
             initCharts();
             updateDashboard();
+            setScenario(0);
         };
 
         function formatCurrency(val) {
             const config = exchangeRates[currentCurrency];
-            const convertedVal = val * config.rate;
-            return new Intl.NumberFormat(config.locale, { style: 'currency', currency: config.currency }).format(convertedVal);
+            return new Intl.NumberFormat(config.locale, { style: 'currency', currency: config.currency }).format(val * config.rate);
         }
-
-        function changeCurrency() {
-            currentCurrency = document.getElementById('currencySelector').value;
-            updateDashboard();
-        }
+        function changeCurrency() { currentCurrency = document.getElementById('currencySelector').value; updateDashboard(); }
 
         function populateFilters() {
             const regions = [...new Set(rawData.map(d => d.region))];
             const sellers = [...new Set(rawData.map(d => d.seller))];
-            fillSelect('filterRegion', regions); fillSelect('filterSeller', sellers);
-            // Meses já estão hardcoded no HTML
+            const products = [...new Set(rawData.map(d => d.product))];
+            fillSelect('filterRegion', regions); fillSelect('filterSeller', sellers); fillSelect('filterProduct', products);
         }
-
         function fillSelect(id, items) {
             const select = document.getElementById(id);
             items.forEach(item => { const opt = document.createElement('option'); opt.value = item; opt.innerText = item; select.appendChild(opt); });
@@ -412,25 +328,105 @@
         function getFilteredData() {
             const r = document.getElementById('filterRegion').value;
             const s = document.getElementById('filterSeller').value;
-            const m = document.getElementById('filterMonth').value; // Novo filtro
-
+            const p = document.getElementById('filterProduct').value;
+            const m = document.getElementById('filterMonth').value;
             return rawData.filter(item => {
-                // Extrair mês do item (0, 1, 2)
                 const itemMonth = new Date(item.date).getMonth().toString();
-                
-                return (r === 'all' || item.region === r) &&
-                       (s === 'all' || item.seller === s) &&
-                       (m === 'all' || itemMonth === m);
+                return (r === 'all' || item.region === r) && (s === 'all' || item.seller === s) && (p === 'all' || item.product === p) && (m === 'all' || itemMonth === m);
             });
         }
 
         function resetFilters() {
-            document.getElementById('filterRegion').value = 'all';
-            document.getElementById('filterSeller').value = 'all';
-            document.getElementById('filterMonth').value = 'all';
+            ['filterRegion', 'filterSeller', 'filterProduct', 'filterMonth'].forEach(id => document.getElementById(id).value = 'all');
+            updateDashboard();
+            showToast("Filtros Removidos");
+        }
+
+        // --- CROSS-FILTERING COM TOGGLE FIX ---
+        function handleChartClick(type, labelValue) {
+            const selectMap = { 'region': 'filterRegion', 'seller': 'filterSeller', 'product': 'filterProduct', 'month': 'filterMonth' };
+            const selectId = selectMap[type];
+            const select = document.getElementById(selectId);
+            
+            let targetValue = labelValue;
+            
+            // Conversão especial para Mês (Label "Jan" -> Value "0")
+            if(type === 'month') {
+                const months = ['Jan', 'Fev', 'Mar'];
+                const idx = months.indexOf(labelValue);
+                if(idx > -1) targetValue = idx.toString();
+            }
+
+            // Lógica de Toggle (Desfazer filtro se clicar no mesmo)
+            if (select.value === targetValue) {
+                select.value = 'all';
+                showToast(`Filtro removido: ${labelValue}`);
+            } else {
+                // Tentar selecionar
+                let found = false;
+                for(let i=0; i<select.options.length; i++) {
+                    if(select.options[i].value === targetValue || select.options[i].text === targetValue) {
+                        select.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) showToast(`Filtrando por: ${labelValue}`);
+                else if (type === 'month') { // Força valor se for mês (casos de index)
+                    select.value = targetValue;
+                    showToast(`Filtrando por: ${labelValue}`);
+                }
+            }
             updateDashboard();
         }
 
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toast-msg").innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // --- SIMULAÇÃO ---
+        function setScenario(type) {
+            const slider = document.getElementById('growthSlider');
+            const btns = document.querySelectorAll('.scenario-btn');
+            const desc = document.getElementById('scenario-desc');
+            
+            btns.forEach(b => b.classList.remove('active', 'recovery-active'));
+            
+            let rate = 0;
+            simulationState.isRecovery = false;
+
+            if (type === 0) {
+                rate = 0; 
+                btns[0].classList.add('active');
+                desc.innerText = "*Cenário base: Manutenção da tendência de Março.";
+            }
+            if (type === 1) {
+                rate = 110; 
+                btns[1].classList.add('recovery-active');
+                simulationState.isRecovery = true; // Ativa visualização de melhoria
+                desc.innerText = "*Cenário de Correção: Recuperação do nível de stock e vendas.";
+            }
+            if (type === 2) {
+                rate = 220; 
+                btns[2].classList.add('active');
+                desc.innerText = "*Cenário Otimista: Sucesso total na estratégia de bundles.";
+            }
+            
+            slider.value = rate;
+            updateProjectionFromSlider();
+        }
+
+        function updateProjectionFromSlider() {
+            const val = parseInt(document.getElementById('growthSlider').value);
+            document.getElementById('growthValueDisplay').innerText = (val >= 0 ? '+' : '') + val + '%';
+            simulationState.growthRate = val / 100;
+            updateChartsData(getFilteredData()); 
+        }
+
+        // --- UPDATE ---
         function updateDashboard() {
             const data = getFilteredData();
             updateKPIs(data);
@@ -443,124 +439,112 @@
             const totalSales = data.reduce((sum, item) => sum + item.total, 0);
             const totalUnits = data.reduce((sum, item) => sum + item.units, 0);
             const avgTicket = data.length > 0 ? totalSales / data.length : 0;
-
             document.getElementById('kpiSales').innerText = formatCurrency(totalSales);
             document.getElementById('kpiUnits').innerText = totalUnits;
             document.getElementById('kpiTicket').innerText = formatCurrency(avgTicket);
-
-            const isMonthFiltered = document.getElementById('filterMonth').value !== 'all';
             
-            if(isMonthFiltered || data.length === 0) {
-                document.getElementById('trendSales').style.display = 'none';
-                document.getElementById('trendUnits').style.display = 'none';
-            } else {
-                document.getElementById('trendSales').style.display = 'inline-flex';
-                document.getElementById('trendUnits').style.display = 'inline-flex';
-                calculateTrends(data);
-            }
+            const isFull = document.getElementById('filterMonth').value === 'all';
+            const display = isFull && data.length > 0 ? 'inline-flex' : 'none';
+            document.getElementById('trendSales').style.display = display;
+            document.getElementById('trendUnits').style.display = display;
+            if(isFull) calculateTrends(data);
         }
 
         function calculateTrends(data) {
-            const monthlySales = {};
-            const monthlyUnits = {};
-            data.forEach(d => {
-                const month = new Date(d.date).getMonth();
-                monthlySales[month] = (monthlySales[month] || 0) + d.total;
-                monthlyUnits[month] = (monthlyUnits[month] || 0) + d.units;
-            });
-
-            const activeMonths = Object.keys(monthlySales).map(Number).sort((a,b) => a-b);
-            const lastMonth = activeMonths[activeMonths.length - 1];
-            const prevMonth = activeMonths[activeMonths.length - 2];
-
-            updateTrendBadge('trendSales', monthlySales[lastMonth], monthlySales[prevMonth]);
-            updateTrendBadge('trendUnits', monthlyUnits[lastMonth], monthlyUnits[prevMonth]);
-        }
-
-        function updateTrendBadge(elementId, current, previous) {
-            const el = document.getElementById(elementId);
-            if (previous === undefined || previous === 0) {
-                el.className = 'trend-badge trend-neutral'; el.innerHTML = '<span>Novo</span>'; return;
-            }
-            const percent = ((current - previous) / previous) * 100;
-            const isUp = percent >= 0;
-            el.className = `trend-badge ${isUp ? 'trend-up' : 'trend-down'}`;
-            el.innerHTML = `<span>${isUp ? '▲' : '▼'} ${Math.abs(percent).toFixed(1)}%</span>`;
+            const monthly = {};
+            data.forEach(d => { const m = new Date(d.date).getMonth(); monthly[m] = (monthly[m]||0) + d.total; });
+            const months = Object.keys(monthly).map(Number).sort((a,b)=>a-b);
+            const last = months[months.length-1];
+            const prev = months[months.length-2];
+            
+            const el = document.getElementById('trendSales');
+            if(!prev) { el.innerHTML = '<span>Novo</span>'; el.className='trend-badge trend-neutral'; return; }
+            const p = ((monthly[last]-monthly[prev])/monthly[prev])*100;
+            el.innerHTML = `<span>${p>=0?'▲':'▼'} ${Math.abs(p).toFixed(1)}%</span>`;
+            el.className = `trend-badge ${p>=0?'trend-up':'trend-down'}`;
         }
 
         function updateSellerBestProducts(data) {
             const container = document.getElementById('sellerCardsContainer');
             container.innerHTML = '';
-            if(data.length === 0) { container.innerHTML = '<p style="color:#777; padding:10px;">Nenhum dado para este filtro.</p>'; return; }
-
-            const sellersMap = {};
-            data.forEach(item => {
-                if (!sellersMap[item.seller]) sellersMap[item.seller] = { name: item.seller, totalSales: 0, products: {} };
-                sellersMap[item.seller].totalSales += item.total;
-                if (!sellersMap[item.seller].products[item.product]) sellersMap[item.seller].products[item.product] = 0;
-                sellersMap[item.seller].products[item.product] += item.total;
+            if(data.length===0) { container.innerHTML='<p style="color:#777; padding:10px;">Sem dados.</p>'; return; }
+            const sellers = {};
+            data.forEach(d => {
+                if(!sellers[d.seller]) sellers[d.seller] = { name: d.seller, total: 0, prods: {} };
+                sellers[d.seller].total += d.total;
+                sellers[d.seller].prods[d.product] = (sellers[d.seller].prods[d.product]||0) + d.total;
             });
-
-            Object.values(sellersMap).forEach(s => {
-                let topProduct = ''; let maxVal = -1;
-                for (const [prod, val] of Object.entries(s.products)) { if (val > maxVal) { maxVal = val; topProduct = prod; } }
-                const card = document.createElement('div');
-                card.className = 'seller-card';
-                card.innerHTML = `
-                    <div class="seller-info">
-                        <h4>${s.name}</h4>
-                        <div class="top-product-badge">★ ${topProduct}</div>
-                    </div>
-                    <div class="seller-total">
-                        <span style="font-size:0.7rem; color:#999; display:block;">Vendas</span>
-                        <strong>${formatCurrency(s.totalSales)}</strong>
-                    </div>
-                `;
-                container.appendChild(card);
+            Object.values(sellers).forEach(s => {
+                let best = '', max = -1;
+                for(const [p,v] of Object.entries(s.prods)) if(v>max){ max=v; best=p; }
+                const div = document.createElement('div');
+                div.className = 'seller-card';
+                div.innerHTML = `<div class="seller-info"><h4>${s.name}</h4><div class="top-product-badge">★ ${best}</div></div><div class="seller-total"><strong>${formatCurrency(s.total)}</strong></div>`;
+                container.appendChild(div);
             });
         }
 
         function updateProductTable(data) {
             const tbody = document.querySelector('#productTable tbody');
             tbody.innerHTML = '';
-            if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#777;">Sem dados encontrados.</td></tr>'; return; }
-
-            const productsMap = {};
-            data.forEach(item => {
-                if(!productsMap[item.product]) productsMap[item.product] = { name: item.product, price: item.price, units: 0, total: 0 };
-                productsMap[item.product].units += item.units;
-                productsMap[item.product].total += item.total;
+            if(data.length===0) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center; padding:15px;">Sem dados.</td></tr>'; return; }
+            const prods = {};
+            data.forEach(d => {
+                if(!prods[d.product]) prods[d.product] = { name: d.product, price: d.price, units: 0, total: 0 };
+                prods[d.product].units += d.units;
+                prods[d.product].total += d.total;
             });
-
-            Object.values(productsMap).sort((a,b) => b.total - a.total).forEach(p => {
+            Object.values(prods).sort((a,b)=>b.total-a.total).forEach(p => {
                 const tr = document.createElement('tr');
-                let badgeClass = p.price >= 1000 ? 'high-ticket' : (p.price >= 200 ? 'mid-ticket' : 'low-ticket');
-                let badgeLabel = p.price >= 1000 ? 'Alto' : (p.price >= 200 ? 'Médio' : 'Baixo');
-                tr.innerHTML = `
-                    <td style="font-weight:600; color:#2d3748;">${p.name}</td>
-                    <td style="font-family:'Consolas', monospace; color:#718096;">${formatCurrency(p.price)}</td>
-                    <td style="text-align:center;">${p.units}</td>
-                    <td style="font-weight:700; color:var(--accent-color);">${formatCurrency(p.total)}</td>
-                    <td><span class="badge-price ${badgeClass}">${badgeLabel}</span></td>
-                `;
+                let badge = p.price >= 1000 ? ['high-ticket','Alto'] : (p.price>=200 ? ['mid-ticket','Médio'] : ['low-ticket','Baixo']);
+                tr.innerHTML = `<td style="font-weight:600">${p.name}</td><td>${formatCurrency(p.price)}</td><td style="text-align:center">${p.units}</td><td style="font-weight:700;color:var(--accent-color)">${formatCurrency(p.total)}</td><td><span class="badge-price ${badge[0]}">${badge[1]}</span></td>`;
                 tbody.appendChild(tr);
             });
         }
 
+        // --- GRÁFICOS ---
         function initCharts() {
             Chart.defaults.font.family = "'Inter', sans-serif";
             Chart.defaults.color = '#718096';
-            const optionsBase = { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } },
-                layout: { padding: 10 }
-            };
             
-            charts.region = new Chart(document.getElementById('chartRegion'), { type: 'bar', data: {}, options: { ...optionsBase, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f0f0f0' } }, x: { grid: { display: false } } } } }); 
-            charts.seller = new Chart(document.getElementById('chartSeller'), { type: 'bar', data: {}, options: { ...optionsBase, indexAxis: 'y', scales: { x: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f0f0f0' } }, y: { grid: { display: false } } } } });
-            charts.product = new Chart(document.getElementById('chartProduct'), { type: 'doughnut', data: {}, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } } } } });
-            charts.time = new Chart(document.getElementById('chartTime'), { type: 'line', data: {}, options: { ...optionsBase, scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f0f0f0' } }, x: { grid: { display: false } } } } });
+            const clickOption = (type) => ({
+                onClick: (e, elements, chart) => {
+                    if(elements.length > 0) {
+                        const idx = elements[0].index;
+                        const label = chart.data.labels[idx];
+                        handleChartClick(type, label);
+                    }
+                }
+            });
+
+            const common = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, layout: { padding: 10 } };
+
+            charts.region = new Chart(document.getElementById('chartRegion'), { type: 'bar', data: {}, options: { ...common, ...clickOption('region'), scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
+            charts.seller = new Chart(document.getElementById('chartSeller'), { type: 'bar', data: {}, options: { ...common, ...clickOption('seller'), indexAxis: 'y', scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } } } });
+            charts.product = new Chart(document.getElementById('chartProduct'), { type: 'doughnut', data: {}, options: { ...common, ...clickOption('product'), cutout: '65%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } } } } });
+            
+            // TIME CHART (Linha)
+            charts.time = new Chart(document.getElementById('chartTime'), { 
+                type: 'line', data: { labels: [], datasets: [] }, 
+                options: { 
+                    ...common, 
+                    ...clickOption('month'),
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f0f0f0' } }, x: { grid: { display: false } } },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label + ': ' + formatCurrency(context.raw);
+                                    if (context.dataset.label === 'Recuperação') label += ' (Ganho Estimado)';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                } 
+            });
         }
 
         function aggregateData(data, key) {
@@ -574,96 +558,73 @@
         }
 
         function updateChartsData(data) {
-            const update = (chart, agg, type='bar') => {
+            const update = (chart, agg, type) => {
                 chart.data.labels = agg.labels;
-                chart.data.datasets = [{
-                    label: 'Vendas', data: agg.values, 
-                    backgroundColor: colors.vivid, 
-                    borderColor: 'transparent', 
-                    borderRadius: 8, 
-                    barThickness: 30,
-                    hoverBackgroundColor: colors.vivid[0] 
-                }];
-                
-                if(type === 'line') {
-                    chart.data.datasets[0].borderColor = colors.vivid[1];
-                    chart.data.datasets[0].backgroundColor = 'rgba(121, 40, 202, 0.1)';
-                    chart.data.datasets[0].borderWidth = 3;
-                    chart.data.datasets[0].pointBackgroundColor = 'white';
-                    chart.data.datasets[0].pointBorderColor = colors.vivid[1];
-                    chart.data.datasets[0].pointRadius = 4;
-                    chart.data.datasets[0].fill = true;
-                    chart.data.datasets[0].tension = 0.4;
-
-                    // Custom Tooltip Logic for Line Chart (Monthly variation)
-                    chart.options.plugins.tooltip.callbacks.label = function(context) {
-                        let label = ' ' + formatCurrency(context.raw);
-                        // Check if there is a previous point
-                        if (context.dataIndex > 0) {
-                            const current = context.raw;
-                            const previous = context.chart.data.datasets[0].data[context.dataIndex - 1];
-                            if (previous && previous !== 0) {
-                                const percent = ((current - previous) / previous) * 100;
-                                const sign = percent > 0 ? '+' : '';
-                                const symbol = percent > 0 ? '▲' : '▼';
-                                label += ` (${symbol} ${sign}${percent.toFixed(1)}% vs mês anterior)`;
-                            }
-                        }
-                        return label;
-                    };
-                } else if (type === 'doughnut') {
-                   chart.data.datasets[0].backgroundColor = colors.vivid;
-                   chart.data.datasets[0].borderColor = 'white';
-                   chart.data.datasets[0].borderWidth = 2;
-                   // Reset default label callback for non-line charts
-                   chart.options.plugins.tooltip.callbacks.label = function(context) {
-                        return ' ' + formatCurrency(context.raw);
-                   };
-                } else {
-                   // Bar Charts
-                   chart.data.datasets[0].backgroundColor = agg.values.map((_, i) => colors.vivid[i % colors.vivid.length]);
-                   // Reset default label callback for non-line charts
-                   chart.options.plugins.tooltip.callbacks.label = function(context) {
-                        return ' ' + formatCurrency(context.raw);
-                   };
-                }
-
-                // Tooltips general styling
-                chart.options.plugins.tooltip.backgroundColor = 'rgba(45, 55, 72, 0.9)';
-                chart.options.plugins.tooltip.padding = 10;
-                chart.options.plugins.tooltip.cornerRadius = 8;
-                
-                // Format Axis
-                if (type !== 'doughnut') {
-                    const axis = type === 'bar' && chart.config.type === 'bar' && chart.options.indexAxis !== 'y' ? 'y' : (chart.options.indexAxis === 'y' ? 'x' : 'y');
-                    chart.options.scales[axis].ticks.callback = function(value) { return formatCurrency(value); };
-                }
+                chart.data.datasets = [{ label: 'Vendas', data: agg.values, backgroundColor: colors.vivid, borderRadius: 6, barThickness: 30 }];
+                if (type === 'bar') chart.data.datasets[0].backgroundColor = agg.values.map((_, i) => colors.vivid[i % colors.vivid.length]);
+                if (type === 'doughnut') { chart.data.datasets[0].borderColor = 'white'; chart.data.datasets[0].borderWidth = 2; }
+                chart.options.plugins.tooltip.callbacks.label = (ctx) => ' ' + formatCurrency(ctx.raw);
                 chart.update();
             };
 
-            update(charts.region, aggregateData(data, 'region'));
-            update(charts.seller, aggregateData(data, 'seller'));
+            update(charts.region, aggregateData(data, 'region'), 'bar');
+            update(charts.seller, aggregateData(data, 'seller'), 'bar');
             update(charts.product, aggregateData(data, 'product'), 'doughnut');
-            
-            // Gráfico de Tempo
+
+            // Time Chart Híbrido
             const tData = aggregateData(data, 'date');
             const order = ['Jan', 'Fev', 'Mar'];
-            const sorted = tData.labels.map((l, i) => ({l, v: tData.values[i]})).sort((a, b) => order.indexOf(a.l) - order.indexOf(b.l));
-            update(charts.time, { labels: sorted.map(x => x.l), values: sorted.map(x => x.v) }, 'line');
+            const actuals = [0, 0, 0];
+            tData.labels.forEach((l, i) => { const idx = order.indexOf(l); if(idx > -1) actuals[idx] = tData.values[i]; });
+
+            let baseline = actuals[2] || (actuals.reduce((a,b)=>a+b,0)/3);
+            let proj = [baseline*(1+simulationState.growthRate), baseline*(1+simulationState.growthRate)*1.05, baseline*(1+simulationState.growthRate)*1.10];
             
-            // Atualizar subtítulo do gráfico de tempo
-            const subtitle = document.getElementById('chartTimeSubtitle');
-            if(sorted.length >= 2) {
-                const last = sorted[sorted.length-1].v;
-                const prev = sorted[sorted.length-2].v;
-                const pc = ((last - prev) / prev) * 100;
-                const sign = pc >= 0 ? '+' : '';
-                subtitle.innerText = `Último Mês: ${sign}${pc.toFixed(1)}%`;
-                subtitle.className = pc >= 0 ? 'trend-badge trend-up' : 'trend-badge trend-down';
-                subtitle.style.display = 'inline-flex';
-            } else {
-                subtitle.style.display = 'none';
+            const isFull = document.getElementById('filterMonth').value === 'all';
+            const labels = isFull ? ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'] : tData.labels;
+            
+            charts.time.data.labels = labels;
+            
+            // Datasets
+            const dsActual = { label: 'Realizado', data: isFull ? [...actuals, null, null, null] : tData.values, borderColor: colors.actual, backgroundColor: colors.actual, borderWidth: 3, tension: 0.4 };
+            const dsProjected = { label: 'Projeção', data: isFull ? [null, null, baseline, ...proj] : [], borderColor: colors.projected, backgroundColor: colors.projected, borderWidth: 3, borderDash: [5, 5], tension: 0.4 };
+            
+            // Lógica de Visualização da "Carencia de Produtos" (Recuperação)
+            // Se estiver no modo recuperação, adiciona um dataset de área para destacar o ganho
+            let dsRecovery = null;
+            if (simulationState.isRecovery && isFull) {
+                // Cria uma linha "Base" (Tendência ruim) vs "Projeção" (Recuperação)
+                // Apenas para efeito visual de preenchimento
+                dsRecovery = {
+                    label: 'Recuperação de Stock',
+                    data: [null, null, baseline, proj[0], proj[1], proj[2]],
+                    borderColor: 'transparent',
+                    backgroundColor: 'rgba(0, 224, 150, 0.2)', // Verde transparente
+                    fill: 'start', // Preenche até ao início (ou até outro dataset se configurado, simplificado aqui)
+                    pointRadius: 0
+                };
             }
+
+            charts.time.data.datasets = dsRecovery ? [dsActual, dsProjected, dsRecovery] : [dsActual, dsProjected];
+
+            // Update simulation KPIs
+            if(isFull) {
+                const totalQ2 = proj.reduce((a,b)=>a+b,0);
+                const totalQ1 = actuals.reduce((a,b)=>a+b,0);
+                const diff = totalQ1 > 0 ? ((totalQ2-totalQ1)/totalQ1)*100 : 0;
+                document.getElementById('projRevenue').innerText = formatCurrency(totalQ2);
+                document.getElementById('projDiff').innerText = (diff>=0?'+':'')+diff.toFixed(1)+'%';
+                document.getElementById('projDiff').style.color = diff>=0 ? '#00E096' : '#FF005C';
+                
+                const lastVar = actuals[1] > 0 ? ((actuals[2]-actuals[1])/actuals[1])*100 : 0;
+                const badge = document.getElementById('chartTimeSubtitle');
+                badge.innerText = `Mês (Real): ${lastVar>=0?'+':''}${lastVar.toFixed(1)}%`;
+                badge.className = `trend-badge ${lastVar>=0?'trend-up':'trend-down'}`;
+            } else {
+                 document.getElementById('projRevenue').innerText = '-';
+                 document.getElementById('projDiff').innerText = '-';
+            }
+            charts.time.update();
         }
     </script>
 </body>
